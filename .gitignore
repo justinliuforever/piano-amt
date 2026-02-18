@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+
+# Models (large binaries)
+models/*.onnx
+models/*.pt
+models/*.pth
+models/*.ckpt
+
+# Test artifacts
+tests/fixtures/*.wav
+tests/fixtures/*.mid
+
+# MAESTRO data
+data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+.env
