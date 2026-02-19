@@ -13,15 +13,13 @@ venv/
 
 # Models (large binaries)
 models/*.onnx
+models/*.onnx.data
 models/*.pt
 models/*.pth
 models/*.ckpt
+models/*.torch
 
-# Test artifacts
-tests/fixtures/*.wav
-tests/fixtures/*.mid
-
-# MAESTRO data
+# Data directory
 data/
 
 # IDE
@@ -33,6 +31,10 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Caches
+.pytest_cache/
+.ruff_cache/
 
 # Misc
 *.log

@@ -1,1 +1,1 @@
-"""Real-time piano automatic music transcription."""
+"""Piano automatic music transcription (Audio → MIDI)."""

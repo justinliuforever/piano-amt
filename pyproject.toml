@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "piano-amt"
-version = "0.1.0"
-description = "Real-time piano automatic music transcription (Audio → MIDI)"
+version = "0.2.0"
+description = "Piano automatic music transcription (Audio → MIDI)"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",
@@ -13,8 +13,9 @@ dependencies = [
     "soundfile>=0.12",
     "onnxruntime>=1.16",
     "pretty_midi>=0.2.10",
-    "mido>=1.3",
-    "python-rtmidi>=1.5",
+    "scipy>=1.10",
+    "mir_eval>=0.7",
+    "pandas>=2.0",
 ]
 
 [project.optional-dependencies]
@@ -22,7 +23,6 @@ dev = [
     "pytest>=7.0",
     "ruff>=0.1",
     "mypy>=1.0",
-    "mir_eval>=0.7",
 ]
 export = [
     "torch>=2.0",
@@ -30,7 +30,7 @@ export = [
 ]
 
 [project.scripts]
-piano-amt = "piano_amt.cli.main:main"
+piano-amt = "piano_amt.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/piano_amt"]
