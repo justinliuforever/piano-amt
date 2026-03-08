@@ -35,6 +35,9 @@ class ExportableWrapper(nn.Module):
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Forward pass with explicit diff computation.
 
+        Replaces aten::diff (unsupported by ONNX) with manual subtraction,
+        then calls the model's internal stages directly.
+
         Args:
             x: Mel spectrogram (batch, 229, T)
 
@@ -42,12 +45,28 @@ class ExportableWrapper(nn.Module):
             onset_probs: (batch, 88, T) sigmoid onset probabilities
             velocity_probs: (batch, 88, T) sigmoid velocity values
         """
-        # Use the model's own forward method
-        x_stages, velocities = self.model(x)
+        model = self.model
 
-        # x_stages is list of 3 tensors, each (batch, 88, T-1)
-        # Take the last (best) stage and apply sigmoid
+        # Compute temporal diff manually instead of x.diff(dim=-1)
+        xdiff = x[:, :, 1:] - x[:, :, :-1]
+        x_trimmed = x[:, :, 1:]
+        x2 = torch.stack([x_trimmed, xdiff], dim=1)  # (batch, 2, 229, T-1)
+
+        # Run through model internals, bypassing forward_onsets
+        x2 = model.specnorm(x2)
+        stem_out = model.stem(x2)
+        stage_x = model.onset_stages[0](stem_out)
+        x_stages = [stage_x]
+        for stg in model.onset_stages[1:]:
+            stage_x = stg(stem_out) + x_stages[-1]
+            x_stages.append(stage_x)
+        for st in x_stages:
+            st.squeeze_(1)
+
         onset_logits = x_stages[-1]
+        stem_out = torch.cat([stem_out, onset_logits.unsqueeze(1)], dim=1)
+        velocities = model.velocity_stage(stem_out).squeeze(1)
+
         onset_probs = torch.sigmoid(onset_logits)
         velocity_probs = torch.sigmoid(velocities)
 
